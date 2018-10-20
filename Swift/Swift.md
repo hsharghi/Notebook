@@ -1,4 +1,4 @@
-# Swift-notebook
+# Swift notes and snippets
 
 
 * [Create Singleton in App](#create-singleton-in-app)

@@ -1,7 +1,10 @@
-Change rootViewController based on some value stored in UserDefaults
+# iOS notes and snippets
 
-`AppDelegate.swift`
+* [Change rootViewController based on some value stored in UserDefaults](#change-rootviewcontroller-based-on-some-value-stored-in-userdefaults)
+
+
 ```swift
+// AppDelegate.swift
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
@@ -14,8 +17,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-`Switcher.swift`
+
 ```swift
+// Switcher.swift
 import Foundation
 import UIKit
 

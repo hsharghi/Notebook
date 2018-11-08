@@ -67,3 +67,22 @@ extension Future where T == Void {
     }
 }
 ```
+
+group by multiple models
+
+```swift
+.decode(ModelB.self).groupBy(\ModelB.column).decode(Original Model.self)
+```
+
+add unique flag in migration
+
+```
+extension User: Migration {
+    static func prepare(on conn: MySQLDatabase.Connection) -> Future<Void> {
+        return Database.create(self, on: conn) { builder in
+            try addProperties(to: builder)
+            builder.unique(on: \.email)
+        }
+    }
+}
+```

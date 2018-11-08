@@ -41,3 +41,29 @@ final class CategoryController {
     }
 }
 ```
+
+deleting all Redis keys with given prefix
+
+```swift
+extension Future where T == Void {
+    func deleteInRedis(prefix: String, on container: Container) -> Future<Void> {
+        return flatMap {
+            container.withPooledConnection(to: .redis) { (redis: RedisClient) in
+                redis
+                    .command("KEYS", [
+                        .init(stringLiteral: "\(prefix)*")
+                    ])
+                    .flatMap { (result: RedisData) in
+                        guard let keys = result.array, !keys.isEmpty else {
+                            return container.future()
+                        }
+
+                        return redis
+                            .command("DEL", keys)
+                            .transform(to: ())
+                    }
+            }
+        }
+    }
+}
+```

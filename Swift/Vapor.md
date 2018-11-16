@@ -86,3 +86,8 @@ extension User: Migration {
     }
 }
 ```
+
+Enable query logging 
+`databases.enableLogging(on: .sqlite)`
+
+

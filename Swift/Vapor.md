@@ -89,5 +89,12 @@ extension User: Migration {
 
 Enable query logging 
 `databases.enableLogging(on: .sqlite)`
+```swift
+    let mySQL = MySQLDatabase(config: config)
 
+    var database = DatabasesConfig()
+    database.enableLogging(on: .mysql)
+    database.add(database: mySQL, as: .mysql)
+    services.register(database)
+```
 

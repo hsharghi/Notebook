@@ -14,6 +14,22 @@ let directory = DirectoryConfig.detect().workDir.finished(with: "/") + "Public".
 
 ```
 
+* [Check if resource in url exists](#check-if-resource-in-url-exists)
+
+```swift
+        // if inside a request closure
+        let client = try req.client()
+        let fileExists = client.send(.HEAD, to: "http://domain.com/image.png").map { (response) -> Bool in
+            return response.http.status.code == 200
+        }
+        
+        let fileExists = HTTPClient.connect(hostname: "domain.com", on: req).flatMap { (client) -> Future<Bool> in
+        let request = HTTPRequest(method: .HEAD, url: "/image.png")
+        return client.send(request).map({ (response) in
+           return response.status.code == 200
+        })
+```
+
 * [Map items with a transform function](#map-items-with-a-transform-function)
 
 drop this in your project:

@@ -114,3 +114,31 @@ Enable query logging
     services.register(database)
 ```
 
+
+Codable Struct with custom Decoder/Encode
+
+```swift
+import Foundation
+
+struct Message {
+    var data: [String: [String: String]]
+}
+
+extension Message: Codable {
+    init(from decoder: Decoder) throws {
+        let data = try [String: [String: String]].init(from: decoder)
+        self.init(data: data)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        return try data.encode(to: encoder)
+    }
+}
+
+let message = Message(data: ["Alphabet": ["A": "a", "B": "b"], "Number": ["One": "1", "Two": "2"]])
+let data = try JSONEncoder().encode(message)
+print(String(data: data, encoding: .utf8))
+
+let decoded = try JSONDecoder().decode(Message.self, from: data)
+print(decoded)
+```

@@ -145,6 +145,8 @@ print(decoded)
 
 
 * [Use alsoDecode to prevent N+1 problem](#use-alsodecode-to-prevent-N-1-problem)
+
+```swift
 func tabledata(req: Request) throws -> Future<[IdeaOverview]> {
     return Idea.query(on: req)
         .join(\User.id, to: \Idea.creatorUserId)
@@ -154,4 +156,4 @@ func tabledata(req: Request) throws -> Future<[IdeaOverview]> {
             rows.map { IdeaOverview(idea: $0.0, user: $0.1, businessValue: nil) }
         }
 }
-
+```

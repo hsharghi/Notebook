@@ -142,3 +142,16 @@ print(String(data: data, encoding: .utf8))
 let decoded = try JSONDecoder().decode(Message.self, from: data)
 print(decoded)
 ```
+
+
+* [Use alsoDecode to prevent N+1 problem](#use-alsodecode-to-prevent-N-1-problem)
+func tabledata(req: Request) throws -> Future<[IdeaOverview]> {
+    return Idea.query(on: req)
+        .join(\User.id, to: \Idea.creatorUserId)
+        .alsoDecode(User.self)
+        .all()
+        .map { (rows: [(Idea, User)] -> [IdeaOverview] in
+            rows.map { IdeaOverview(idea: $0.0, user: $0.1, businessValue: nil) }
+        }
+}
+

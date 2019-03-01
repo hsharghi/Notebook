@@ -157,3 +157,14 @@ func tabledata(req: Request) throws -> Future<[IdeaOverview]> {
         }
 }
 ```
+
+
+Get request body as String
+
+```swift
+request.http.body.consumeData(on: req)
+.map { String(data: $0, encoding: .utf8) }
+.map { bodyString in
+    //do what you need to do 
+}
+```

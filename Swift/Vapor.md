@@ -168,3 +168,85 @@ request.http.body.consumeData(on: req)
     //do what you need to do 
 }
 ```
+
+
+map and flatMap for nil optional
+
+```swift
+//
+//  Future+NilMap.swift
+//  Created on 3/10/19
+//
+
+import Async
+
+public protocol OptionalConstrainable {
+    associatedtype Element
+    var asOptional: Optional<Element> { get }
+}
+
+extension Optional: OptionalConstrainable {
+    public var asOptional: Optional<Wrapped> { return self }
+}
+
+extension Future where Expectation: OptionalConstrainable {
+    /// Calls the supplied closure if the chained `Future`'s optional return value resolves to a nil.
+    ///
+    /// The closure gives you a chance to return something non-nil.
+    ///
+    /// The callback expects a non-`Future` return. See `nilFlatMap` for a Future return.
+    public func nilMap(_ callback: @escaping () throws -> Expectation.Element) -> Future<Expectation.Element> {
+        let promise = eventLoop.newPromise(Expectation.Element.self)
+        
+        addAwaiter { result in
+            switch result {
+            case .error(let error):
+                promise.fail(error: error)
+            case .success(let e):
+                if let result = e.asOptional {
+                    promise.succeed(result: result)
+                } else {
+                    do {
+                        try promise.succeed(result: callback())
+                    } catch {
+                        promise.fail(error: error)
+                    }
+                }
+                
+            }
+        }
+        
+        return promise.futureResult
+    }
+    
+    /// Calls the supplied closure if the chained `Future`'s optional return value resolves to a nil.
+    ///
+    /// The closure gives you a chance to return something non-nil.
+    ///
+    /// The callback expects a `Future` return. See `nilMap` for a non-`Future` return.
+    public func nilFlatMap(_ callback: @escaping () throws -> Future<Expectation.Element>) -> Future<Expectation.Element> {
+        let promise = eventLoop.newPromise(Expectation.Element.self)
+        
+        addAwaiter { result in
+            switch result {
+            case .error(let error):
+                promise.fail(error: error)
+            case .success(let e):
+                if let result = e.asOptional {
+                    promise.succeed(result: result)
+                } else {
+                    do {
+                        let mapped = try callback()
+                        mapped.cascade(promise: promise)
+                    } catch {
+                        promise.fail(error: error)
+                    }
+                }
+                
+            }
+        }
+        
+        return promise.futureResult
+    }
+}
+```

@@ -250,3 +250,18 @@ extension Future where Expectation: OptionalConstrainable {
     }
 }
 ```
+
+Custom keys for DB, json response and ...
+
+
+```swift
+final class MyModel: ... {
+    // ...
+    let dogBreed: String
+
+    enum CodingKeys: String, CodingKeys {
+        case dogBreed = "dog_breed"
+    }
+}
+```
+

@@ -265,3 +265,51 @@ final class MyModel: ... {
 }
 ```
 
+
+Use .wait() on queries with this Request extension
+
+```swift
+func allMatchesList(_ request: Request) throws -> Future<[FootballMatchForm]> {
+    return request.dispatch { request -> [FootballMatchForm] in
+        let matches = FootballMatch.query(on: request).range(..<3).all().wait()
+ 
+        let matchIDs = matches.map { $0.requireID() }
+        let allTeams = Team.query(on: request).filter(\Team.matchID ~~ matchIDs).all().wait()
+        let teamsByMatch = [FootballMatch.ID: [Team]](grouping: allTeams, by: { $0.teamID })
+            
+        let teamIDs = allTeams.map { $0.requireID() }
+        let allPlayers = Player.query(on: request).filter(\Player.teamID ~~ teamIDs).all().wait()
+        let playersByTeam = [Team.ID: [Player]](grouping: allPlayers, by: { $0.teamID })
+            
+        let forms = matches.map { match -> FootballMatchForm in
+            let teams = teamsByMatch[match.requireID()] ?? []
+            let players = teams.flatMap { playersByTeam[$0.requireID()] ?? [] }
+
+            return FootballMatchForm(
+                match: match,
+                teams: teams,
+                players: players)
+        }
+
+        return forms
+    }
+}
+
+extension Request {
+    func dispatch<T>(handler: @escaping (Request) throws -> T) -> Future<T> {
+        let promise = eventLoop.newPromise(T.self)
+
+        DispatchQueue.global().async {
+            do {
+                let result = try handler(self)
+                promise.succeed(result: result)
+            } catch {
+                promise.fail(error: error)
+            }
+        }
+
+        return promise.futureResult
+    }
+}
+```
+

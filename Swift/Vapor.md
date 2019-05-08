@@ -313,7 +313,9 @@ extension Request {
 }
 ```
 
-Run `dump.sql` 
+Run `testData.sql` 
+All sql commands should be in one line each.
+
 
 ```swift
 return try req.fileio()

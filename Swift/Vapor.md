@@ -313,3 +313,16 @@ extension Request {
 }
 ```
 
+Run `dump.sql` 
+
+```swift
+return try req.fileio()
+            .read(file: DirectoryConfig.detect().workDir + "testData.sql")
+            .flatMap { req.future(String(data: $0, encoding: .utf8)).unwrap(or: Abort(.badRequest)) }
+            .flatMap { sql in
+                return try sql.split(separator: "\n")
+                    .filter { $0.isEmpty }
+                    .map { try req.connectionPool(to: .mysql).raw("\($0)").run() }
+                    .flatten(on: req)
+        }
+```

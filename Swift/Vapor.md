@@ -328,3 +328,11 @@ return try req.fileio()
                     .flatten(on: req)
         }
 ```
+
+Custom filter query with keypath (typesafe)
+
+```swift
+return try Photo.query(on: req)
+    .filter(custom: SQLiteExpression.binary(SQLiteExpression.column(\Photo.width), .lessThan, SQLiteExpression.column(\Photo.height)))
+    .all()
+```
